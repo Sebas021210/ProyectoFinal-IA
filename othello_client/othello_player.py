@@ -2,19 +2,18 @@ import requests
 import random
 import sys
 import time
+from intelligence import AI_MOVE
 
 ### Public IP Server
 ### Testing Server
 host_name = 'http://localhost:8000'
 
 class OthelloPlayer():
-
     def __init__(self, username):
         ### Player username
         self.username = username
         ### Player symbol in a match
         self.current_symbol = 0
-
 
     def connect(self, session_name) -> bool:
         """
@@ -37,7 +36,6 @@ class OthelloPlayer():
         while session_info['session_status'] == 'active':
             try:
                 if (session_info['round_status'] == 'ready'):
-
                     match_info = requests.post(host_name + '/player/match_info?session_name=' + self.session_name + '&player_name=' + self.username)
                     match_info = match_info.json()
 
@@ -54,14 +52,13 @@ class OthelloPlayer():
                         if self.current_symbol == -1:
                             print('Lets play! You are the black pieces.')
 
-
                     while (match_info['match_status'] == 'active'):
                         turn_info = requests.post(host_name + '/player/turn_to_move?session_name=' + self.session_name + '&player_name=' + self.username + '&match_id=' +match_info['match'])
                         turn_info = turn_info.json()
                         while not turn_info['game_over']:
                             if turn_info['turn']:
                                 print('SCORE ', turn_info['score'])
-                                row, col = self.AI_MOVE(turn_info['board'])
+                                row, col = AI_MOVE(turn_info['board'], self.current_symbol)
                                 move = requests.post(
                                     host_name + '/player/move?session_name=' + self.session_name + '&player_name=' + self.username + '&match_id=' +
                                     match_info['match'] + '&row=' + str(row) + '&col=' + str(col))
@@ -75,7 +72,6 @@ class OthelloPlayer():
                         match_info = requests.post(host_name + '/player/match_info?session_name=' + self.session_name + '&player_name=' + self.username)
                         match_info = match_info.json()
 
-
                 else:
                     print('Waiting for match lottery...')
                     time.sleep(5)
@@ -85,14 +81,6 @@ class OthelloPlayer():
 
             session_info = requests.post(host_name + '/game/game_info?session_name=' + self.session_name)
             session_info = session_info.json()
-
-
-
-    ### Solo modiquen esta función
-    def AI_MOVE(self, board):
-        row = random.randint(0, 7)
-        col = random.randint(0, 7)
-        return (row, col)
 
 if __name__ == '__main__':
     script_name = sys.argv[0]
