@@ -6,7 +6,7 @@ from intelligence import AI_MOVE
 
 ### Public IP Server
 ### Testing Server
-host_name = 'http://localhost:8000'
+host_name = 'http://ec2-18-224-108-149.us-east-2.compute.amazonaws.com:8000'
 
 class OthelloPlayer():
     def __init__(self, username):
